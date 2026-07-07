@@ -1,0 +1,363 @@
+<style>
+    .ccc-wrap {
+        max-width: 650px;
+        margin: 40px auto;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 30px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e2e8f0;
+        box-sizing: border-box;
+    }
+    .ccc-wrap * { box-sizing: border-box; }
+    .ccc-title { text-align: center; color: #0f172a; margin: 0 0 4px; font-size: 24px; font-weight: 800; }
+    .ccc-sub { text-align: center; color: #64748b; font-size: 13px; margin: 0 0 22px; }
+
+    .ccc-preview {
+        padding: 40px 25px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        text-align: center;
+        border: 1px solid #e2e8f0;
+        transition: 0.25s;
+    }
+    .ccc-preview h3 { margin: 0 0 10px; font-size: 24px; }
+    .ccc-preview p { margin: 0 0 12px; font-size: 16px; }
+    .ccc-preview a { text-decoration: underline; font-weight: 600; }
+
+    .ccc-controls { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 18px; }
+    .ccc-box { text-align: left; }
+    .ccc-box label {
+        font-size: 11px; font-weight: 700; color: #64748b;
+        text-transform: uppercase; margin-bottom: 6px; display: block; letter-spacing: .04em;
+    }
+    .ccc-color-row { display: flex; align-items: center; gap: 8px; border: 1px solid #e2e8f0; border-radius: 8px; padding: 4px 8px; background: #f8fafc; }
+    .ccc-color-row input[type="color"] {
+        width: 32px; height: 32px; border: none; padding: 0; cursor: pointer; background: none; flex-shrink: 0;
+    }
+    .ccc-color-row input[type="text"] {
+        border: none; background: transparent; font-size: 13px; width: 100%; color: #0f172a; font-family: monospace; outline: none;
+    }
+
+    .ccc-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 22px; }
+    .ccc-btn {
+        border: none; cursor: pointer; font-weight: 700; font-size: 13px;
+        padding: 10px 16px; border-radius: 8px; transition: 0.2s; flex: 1 1 auto;
+        min-width: 120px;
+    }
+    .ccc-btn-primary { background: #4f46e5; color: #ffffff; }
+    .ccc-btn-primary:hover { background: #4338ca; }
+    .ccc-btn-secondary { background: #eef2ff; color: #4338ca; border: 1px solid #c7d2fe; }
+    .ccc-btn-secondary:hover { background: #e0e7ff; }
+    .ccc-btn-ghost { background: #f1f5f9; color: #334155; border: 1px solid #e2e8f0; }
+    .ccc-btn-ghost:hover { background: #e2e8f0; }
+
+    .ccc-ratio-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 18px; }
+    .ccc-result-card { background: #f8fafc; padding: 15px; border-radius: 10px; text-align: center; border: 1px solid #eef1f5; }
+    .ccc-result-card label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; }
+    .ccc-ratio-display { font-size: 26px; font-weight: 800; color: #0f172a; margin: 8px 0 4px; }
+    .ccc-ratio-label { font-size: 12px; color: #94a3b8; }
+
+    .ccc-meter { height: 10px; border-radius: 6px; background: #e2e8f0; overflow: hidden; margin-bottom: 20px; }
+    .ccc-meter-fill { height: 100%; border-radius: 6px; transition: 0.3s; background: linear-gradient(90deg,#ef4444,#f59e0b,#22c55e); }
+
+    .ccc-badges-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 18px; }
+    .ccc-badge-cell { text-align: center; background: #f8fafc; border-radius: 10px; padding: 10px 6px; border: 1px solid #eef1f5; }
+    .ccc-badge-cell .ccc-badge-title { font-size: 10px; font-weight: 700; color: #64748b; text-transform: uppercase; display: block; margin-bottom: 6px; }
+    .ccc-badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 800; display: inline-block; }
+    .ccc-pass { background: #dcfce7; color: #166534; }
+    .ccc-fail { background: #fee2e2; color: #991b1b; }
+
+    .ccc-info { font-size: 12.5px; color: #64748b; background: #f8fafc; padding: 12px 14px; border-radius: 10px; border: 1px solid #eef1f5; margin-bottom: 8px; line-height: 1.5; }
+    .ccc-info strong { color: #0f172a; }
+
+    .ccc-toast {
+        text-align: center; font-size: 12.5px; font-weight: 700; color: #166534;
+        background: #dcfce7; border-radius: 8px; padding: 8px; margin-top: 10px; display: none;
+    }
+
+    @media (max-width: 560px) {
+        .ccc-controls { grid-template-columns: 1fr; }
+        .ccc-badges-grid { grid-template-columns: repeat(2, 1fr); }
+        .ccc-ratio-row { grid-template-columns: 1fr; }
+        .ccc-wrap { padding: 20px 16px; margin: 20px auto; }
+        .ccc-btn { min-width: 100%; }
+    }
+</style>
+
+<div class="ccc-wrap">
+    <h2 class="ccc-title">Color Contrast Checker</h2>
+    <p class="ccc-sub">Check WCAG AA/AAA contrast for heading &amp; body text against any background</p>
+
+    <div id="cccPreview" class="ccc-preview" style="background-color:#ffffff;">
+        <h3 id="cccHeadingPreview" style="color:#3b82f6;">Large Heading Text</h3>
+        <p id="cccBodyPreview" style="color:#3b82f6;">This is how normal body text looks against the background.</p>
+        <a id="cccLinkPreview" href="javascript:void(0)" style="color:#3b82f6;">This is a sample link</a>
+    </div>
+
+    <div class="ccc-controls">
+        <div class="ccc-box">
+            <label>Heading Text Color</label>
+            <div class="ccc-color-row">
+                <input type="color" id="headingColor" value="#3b82f6">
+                <input type="text" id="headingColorHex" value="#3B82F6" maxlength="7">
+            </div>
+        </div>
+        <div class="ccc-box">
+            <label>Body Text Color</label>
+            <div class="ccc-color-row">
+                <input type="color" id="bodyColor" value="#3b82f6">
+                <input type="text" id="bodyColorHex" value="#3B82F6" maxlength="7">
+            </div>
+        </div>
+        <div class="ccc-box">
+            <label>Background Color</label>
+            <div class="ccc-color-row">
+                <input type="color" id="bgColor" value="#ffffff">
+                <input type="text" id="bgColorHex" value="#FFFFFF" maxlength="7">
+            </div>
+        </div>
+    </div>
+
+    <div class="ccc-actions">
+        <button type="button" class="ccc-btn ccc-btn-primary" onclick="cccAutoFix()">Auto-Fix to Pass AA</button>
+        <button type="button" class="ccc-btn ccc-btn-secondary" onclick="cccSwap()">Swap Text / Background</button>
+        <button type="button" class="ccc-btn ccc-btn-secondary" onclick="cccRandom()">Random Colors</button>
+        <button type="button" class="ccc-btn ccc-btn-ghost" onclick="cccCopyCSS()">Copy CSS</button>
+        <button type="button" class="ccc-btn ccc-btn-ghost" onclick="cccReset()">Reset</button>
+    </div>
+
+    <div class="ccc-ratio-row">
+        <div class="ccc-result-card">
+            <label>Heading Contrast</label>
+            <div id="headingRatio" class="ccc-ratio-display">1.00:1</div>
+            <div class="ccc-ratio-label">Large text (18pt+/bold 14pt+)</div>
+        </div>
+        <div class="ccc-result-card">
+            <label>Body Contrast</label>
+            <div id="bodyRatio" class="ccc-ratio-display">1.00:1</div>
+            <div class="ccc-ratio-label">Normal text</div>
+        </div>
+    </div>
+
+    <div class="ccc-meter"><div id="cccMeterFill" class="ccc-meter-fill" style="width:0%"></div></div>
+
+    <div class="ccc-badges-grid">
+        <div class="ccc-badge-cell">
+            <span class="ccc-badge-title">AA Large</span>
+            <span id="badgeAALarge" class="ccc-badge ccc-fail">FAIL</span>
+        </div>
+        <div class="ccc-badge-cell">
+            <span class="ccc-badge-title">AAA Large</span>
+            <span id="badgeAAALarge" class="ccc-badge ccc-fail">FAIL</span>
+        </div>
+        <div class="ccc-badge-cell">
+            <span class="ccc-badge-title">AA Normal</span>
+            <span id="badgeAANormal" class="ccc-badge ccc-fail">FAIL</span>
+        </div>
+        <div class="ccc-badge-cell">
+            <span class="ccc-badge-title">AAA Normal</span>
+            <span id="badgeAAANormal" class="ccc-badge ccc-fail">FAIL</span>
+        </div>
+    </div>
+
+    <div class="ccc-info">
+        <strong>AA</strong> = minimum accessible standard (Normal text needs 4.5:1, Large text needs 3:1).
+        <strong>AAA</strong> = enhanced standard (Normal text needs 7:1, Large text needs 4.5:1).
+        "Large text" = 18pt+ (24px+) or bold 14pt+ (18.66px+).
+    </div>
+
+    <div id="cccToast" class="ccc-toast">Copied CSS to clipboard!</div>
+</div>
+
+<script>
+(function () {
+    function $(id) { return document.getElementById(id); }
+
+    function normalizeHex(hex) {
+        if (!hex) return null;
+        hex = hex.trim();
+        if (hex[0] !== '#') hex = '#' + hex;
+        if (/^#([A-Fa-f0-9]{3})$/.test(hex)) {
+            hex = '#' + hex[1] + hex[1] + hex[2] + hex[2] + hex[3] + hex[3];
+        }
+        if (/^#([A-Fa-f0-9]{6})$/.test(hex)) return hex.toUpperCase();
+        return null;
+    }
+
+    function getLuminance(hex) {
+        const rgb = hex.match(/[A-Za-z0-9]{2}/g).slice(0, 3).map(function (v) {
+            let val = parseInt(v, 16) / 255;
+            return val <= 0.03928 ? val / 12.92 : Math.pow((val + 0.055) / 1.055, 2.4);
+        });
+        return 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
+    }
+
+    function getRatio(hex1, hex2) {
+        const l1 = getLuminance(hex1);
+        const l2 = getLuminance(hex2);
+        return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+    }
+
+    function setBadge(el, passed) {
+        el.innerText = passed ? 'PASS' : 'FAIL';
+        el.className = 'ccc-badge ' + (passed ? 'ccc-pass' : 'ccc-fail');
+    }
+
+    function darkenOrLighten(hex, bgHex, targetRatio) {
+        // Try darkening and lightening the text color in steps until target ratio met, or return best guess
+        const bgLum = getLuminance(bgHex);
+        const useBlack = bgLum > 0.5; // if bg is light, move text toward black; else toward white
+        let r = parseInt(hex.substr(1, 2), 16);
+        let g = parseInt(hex.substr(3, 2), 16);
+        let b = parseInt(hex.substr(5, 2), 16);
+
+        for (let step = 0; step <= 20; step++) {
+            const factor = step / 20;
+            let nr, ng, nb;
+            if (useBlack) {
+                nr = Math.round(r * (1 - factor));
+                ng = Math.round(g * (1 - factor));
+                nb = Math.round(b * (1 - factor));
+            } else {
+                nr = Math.round(r + (255 - r) * factor);
+                ng = Math.round(g + (255 - g) * factor);
+                nb = Math.round(b + (255 - b) * factor);
+            }
+            const testHex = '#' + [nr, ng, nb].map(function (c) {
+                return c.toString(16).padStart(2, '0');
+            }).join('').toUpperCase();
+            if (getRatio(testHex, bgHex) >= targetRatio) return testHex;
+        }
+        return useBlack ? '#000000' : '#FFFFFF';
+    }
+
+    function syncColorAndHex(colorInput, hexInput) {
+        colorInput.value = hexInput.value.toLowerCase();
+    }
+
+    function updateAll() {
+        const heading = normalizeHex($('headingColorHex').value) || '#3B82F6';
+        const body = normalizeHex($('bodyColorHex').value) || '#3B82F6';
+        const bg = normalizeHex($('bgColorHex').value) || '#FFFFFF';
+
+        $('headingColor').value = heading.toLowerCase();
+        $('bodyColor').value = body.toLowerCase();
+        $('bgColor').value = bg.toLowerCase();
+
+        $('cccPreview').style.backgroundColor = bg;
+        $('cccHeadingPreview').style.color = heading;
+        $('cccBodyPreview').style.color = body;
+        $('cccLinkPreview').style.color = body;
+
+        const headingRatio = getRatio(heading, bg);
+        const bodyRatio = getRatio(body, bg);
+
+        $('headingRatio').innerText = headingRatio.toFixed(2) + ':1';
+        $('bodyRatio').innerText = bodyRatio.toFixed(2) + ':1';
+
+        setBadge($('badgeAALarge'), headingRatio >= 3);
+        setBadge($('badgeAAALarge'), headingRatio >= 4.5);
+        setBadge($('badgeAANormal'), bodyRatio >= 4.5);
+        setBadge($('badgeAAANormal'), bodyRatio >= 7);
+
+        const bestRatio = Math.max(headingRatio, bodyRatio);
+        const meterPct = Math.min(100, (bestRatio / 7) * 100);
+        $('cccMeterFill').style.width = meterPct + '%';
+    }
+
+    function bindColorHex(colorId, hexId) {
+        const colorEl = $(colorId);
+        const hexEl = $(hexId);
+        colorEl.addEventListener('input', function () {
+            hexEl.value = colorEl.value.toUpperCase();
+            updateAll();
+        });
+        hexEl.addEventListener('input', function () {
+            const norm = normalizeHex(hexEl.value);
+            if (norm) updateAll();
+        });
+        hexEl.addEventListener('blur', function () {
+            const norm = normalizeHex(hexEl.value) || colorEl.value.toUpperCase();
+            hexEl.value = norm;
+            updateAll();
+        });
+    }
+
+    bindColorHex('headingColor', 'headingColorHex');
+    bindColorHex('bodyColor', 'bodyColorHex');
+    bindColorHex('bgColor', 'bgColorHex');
+
+    window.cccSwap = function () {
+        const bg = $('bgColorHex').value;
+        const body = $('bodyColorHex').value;
+        $('bgColorHex').value = body;
+        $('bodyColorHex').value = bg;
+        $('headingColorHex').value = bg;
+        updateAll();
+    };
+
+    window.cccRandom = function () {
+        function randHex() {
+            return '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0').toUpperCase();
+        }
+        $('headingColorHex').value = randHex();
+        $('bodyColorHex').value = randHex();
+        $('bgColorHex').value = randHex();
+        updateAll();
+    };
+
+    window.cccAutoFix = function () {
+        const bg = normalizeHex($('bgColorHex').value) || '#FFFFFF';
+        const heading = normalizeHex($('headingColorHex').value) || '#3B82F6';
+        const body = normalizeHex($('bodyColorHex').value) || '#3B82F6';
+
+        $('headingColorHex').value = darkenOrLighten(heading, bg, 3);
+        $('bodyColorHex').value = darkenOrLighten(body, bg, 4.5);
+        updateAll();
+    };
+
+    window.cccReset = function () {
+        $('headingColorHex').value = '#3B82F6';
+        $('bodyColorHex').value = '#3B82F6';
+        $('bgColorHex').value = '#FFFFFF';
+        updateAll();
+    };
+
+    window.cccCopyCSS = function () {
+        const heading = $('headingColorHex').value;
+        const body = $('bodyColorHex').value;
+        const bg = $('bgColorHex').value;
+        const css = 'background-color: ' + bg + ';\nh3 { color: ' + heading + '; }\np, a { color: ' + body + '; }';
+        const toast = $('cccToast');
+
+        function showToast() {
+            toast.style.display = 'block';
+            setTimeout(function () { toast.style.display = 'none'; }, 1800);
+        }
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(css).then(showToast).catch(function () {
+                fallbackCopy(css, showToast);
+            });
+        } else {
+            fallbackCopy(css, showToast);
+        }
+    };
+
+    function fallbackCopy(text, cb) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (e) {}
+        document.body.removeChild(ta);
+        if (cb) cb();
+    }
+
+    updateAll();
+})();
+</script>
