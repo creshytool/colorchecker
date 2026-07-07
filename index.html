@@ -39,6 +39,13 @@
     .ccc-color-row input[type="text"] {
         border: none; background: transparent; font-size: 13px; width: 100%; color: #0f172a; font-family: monospace; outline: none;
     }
+    .ccc-eyedrop-btn {
+        flex-shrink: 0; width: 26px; height: 26px; border: 1px solid #e2e8f0; background: #ffffff;
+        border-radius: 6px; cursor: pointer; font-size: 13px; display: flex; align-items: center; justify-content: center;
+        transition: 0.2s; color: #4f46e5;
+    }
+    .ccc-eyedrop-btn:hover { background: #eef2ff; }
+    .ccc-eyedrop-btn.ccc-active { background: #4f46e5; color: #ffffff; border-color: #4f46e5; }
 
     .ccc-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 22px; }
     .ccc-btn {
@@ -52,6 +59,59 @@
     .ccc-btn-secondary:hover { background: #e0e7ff; }
     .ccc-btn-ghost { background: #f1f5f9; color: #334155; border: 1px solid #e2e8f0; }
     .ccc-btn-ghost:hover { background: #e2e8f0; }
+
+    /* Image upload / eyedropper section */
+    .ccc-image-section {
+        border: 1px dashed #c7d2fe;
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 22px;
+    }
+    .ccc-image-section-title {
+        font-size: 12px; font-weight: 800; color: #4338ca; text-transform: uppercase;
+        letter-spacing: .04em; margin-bottom: 4px;
+    }
+    .ccc-image-section-hint {
+        font-size: 12px; color: #64748b; margin: 0 0 12px;
+    }
+    .ccc-upload-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 12px; }
+    .ccc-file-label {
+        display: inline-flex; align-items: center; gap: 8px; background: #ffffff; border: 1px solid #e2e8f0;
+        border-radius: 8px; padding: 9px 14px; font-size: 13px; font-weight: 700; color: #334155;
+        cursor: pointer; transition: 0.2s;
+    }
+    .ccc-file-label:hover { background: #f1f5f9; }
+    .ccc-file-label input[type="file"] { display: none; }
+    .ccc-pick-target-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .ccc-pick-target {
+        font-size: 12px; font-weight: 700; padding: 7px 12px; border-radius: 20px; cursor: pointer;
+        border: 1px solid #e2e8f0; background: #ffffff; color: #334155; transition: 0.2s;
+    }
+    .ccc-pick-target.ccc-active { background: #4f46e5; color: #ffffff; border-color: #4f46e5; }
+    .ccc-canvas-holder {
+        display: none;
+        max-width: 100%;
+        overflow: hidden;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        margin-top: 4px;
+        text-align: center;
+        background: #fff;
+    }
+    .ccc-canvas-holder canvas {
+        max-width: 100%;
+        display: block;
+        cursor: crosshair;
+        margin: 0 auto;
+    }
+    .ccc-image-empty {
+        font-size: 12px; color: #94a3b8; text-align: center; padding: 4px 0;
+    }
+    .ccc-clear-image {
+        font-size: 12px; font-weight: 700; color: #991b1b; background: #fee2e2; border: none;
+        padding: 6px 12px; border-radius: 20px; cursor: pointer; display: none;
+    }
 
     .ccc-ratio-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 18px; }
     .ccc-result-card { background: #f8fafc; padding: 15px; border-radius: 10px; text-align: center; border: 1px solid #eef1f5; }
@@ -102,6 +162,7 @@
             <div class="ccc-color-row">
                 <input type="color" id="headingColor" value="#3b82f6">
                 <input type="text" id="headingColorHex" value="#3B82F6" maxlength="7">
+                <button type="button" class="ccc-eyedrop-btn" id="pickHeadingBtn" title="Pick from image">✎</button>
             </div>
         </div>
         <div class="ccc-box">
@@ -109,6 +170,7 @@
             <div class="ccc-color-row">
                 <input type="color" id="bodyColor" value="#3b82f6">
                 <input type="text" id="bodyColorHex" value="#3B82F6" maxlength="7">
+                <button type="button" class="ccc-eyedrop-btn" id="pickBodyBtn" title="Pick from image">✎</button>
             </div>
         </div>
         <div class="ccc-box">
@@ -116,8 +178,30 @@
             <div class="ccc-color-row">
                 <input type="color" id="bgColor" value="#ffffff">
                 <input type="text" id="bgColorHex" value="#FFFFFF" maxlength="7">
+                <button type="button" class="ccc-eyedrop-btn" id="pickBgBtn" title="Pick from image">✎</button>
             </div>
         </div>
+    </div>
+
+    <div class="ccc-image-section">
+        <div class="ccc-image-section-title">Pick Colors From an Image</div>
+        <p class="ccc-image-section-hint">Upload a screenshot or design image, then tap the ✎ next to any color field above (or a target below) and click anywhere on the image to grab that exact color.</p>
+        <div class="ccc-upload-row">
+            <label class="ccc-file-label">
+                📁 Upload Image
+                <input type="file" id="cccImageInput" accept="image/*">
+            </label>
+            <div class="ccc-pick-target-row" id="cccPickTargetRow">
+                <span class="ccc-pick-target ccc-active" data-target="heading">Heading</span>
+                <span class="ccc-pick-target" data-target="body">Body</span>
+                <span class="ccc-pick-target" data-target="bg">Background</span>
+            </div>
+            <button type="button" class="ccc-clear-image" id="cccClearImage">Remove Image</button>
+        </div>
+        <div class="ccc-canvas-holder" id="cccCanvasHolder">
+            <canvas id="cccCanvas"></canvas>
+        </div>
+        <div class="ccc-image-empty" id="cccImageEmpty">No image uploaded yet.</div>
     </div>
 
     <div class="ccc-actions">
@@ -206,9 +290,8 @@
     }
 
     function darkenOrLighten(hex, bgHex, targetRatio) {
-        // Try darkening and lightening the text color in steps until target ratio met, or return best guess
         const bgLum = getLuminance(bgHex);
-        const useBlack = bgLum > 0.5; // if bg is light, move text toward black; else toward white
+        const useBlack = bgLum > 0.5;
         let r = parseInt(hex.substr(1, 2), 16);
         let g = parseInt(hex.substr(3, 2), 16);
         let b = parseInt(hex.substr(5, 2), 16);
@@ -231,10 +314,6 @@
             if (getRatio(testHex, bgHex) >= targetRatio) return testHex;
         }
         return useBlack ? '#000000' : '#FFFFFF';
-    }
-
-    function syncColorAndHex(colorInput, hexInput) {
-        colorInput.value = hexInput.value.toLowerCase();
     }
 
     function updateAll() {
@@ -357,6 +436,98 @@
         document.body.removeChild(ta);
         if (cb) cb();
     }
+
+    /* ---------------- Image Upload / Eyedropper ---------------- */
+    const cccImageInput = $('cccImageInput');
+    const cccCanvasHolder = $('cccCanvasHolder');
+    const cccCanvas = $('cccCanvas');
+    const cccImageEmpty = $('cccImageEmpty');
+    const cccClearImage = $('cccClearImage');
+    const cccPickTargetRow = $('cccPickTargetRow');
+    const ctx = cccCanvas.getContext('2d');
+
+    let cccActiveTarget = 'heading'; // heading | body | bg
+    const targetHexMap = { heading: 'headingColorHex', body: 'bodyColorHex', bg: 'bgColorHex' };
+    const targetBtnMap = { heading: 'pickHeadingBtn', body: 'pickBodyBtn', bg: 'pickBgBtn' };
+
+    function setActiveTarget(target) {
+        cccActiveTarget = target;
+        // highlight pick-target pills
+        cccPickTargetRow.querySelectorAll('.ccc-pick-target').forEach(function (el) {
+            el.classList.toggle('ccc-active', el.getAttribute('data-target') === target);
+        });
+        // highlight matching eyedrop button
+        Object.keys(targetBtnMap).forEach(function (key) {
+            $(targetBtnMap[key]).classList.toggle('ccc-active', key === target);
+        });
+    }
+
+    cccPickTargetRow.querySelectorAll('.ccc-pick-target').forEach(function (el) {
+        el.addEventListener('click', function () {
+            setActiveTarget(el.getAttribute('data-target'));
+        });
+    });
+
+    $('pickHeadingBtn').addEventListener('click', function () { setActiveTarget('heading'); });
+    $('pickBodyBtn').addEventListener('click', function () { setActiveTarget('body'); });
+    $('pickBgBtn').addEventListener('click', function () { setActiveTarget('bg'); });
+
+    setActiveTarget('heading');
+
+    cccImageInput.addEventListener('change', function (e) {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function (evt) {
+            const img = new Image();
+            img.onload = function () {
+                const maxWidth = 590;
+                let w = img.width;
+                let h = img.height;
+                if (w > maxWidth) {
+                    h = Math.round(h * (maxWidth / w));
+                    w = maxWidth;
+                }
+                cccCanvas.width = w;
+                cccCanvas.height = h;
+                ctx.drawImage(img, 0, 0, w, h);
+
+                cccCanvasHolder.style.display = 'block';
+                cccImageEmpty.style.display = 'none';
+                cccClearImage.style.display = 'inline-block';
+            };
+            img.src = evt.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
+
+    cccCanvas.addEventListener('click', function (e) {
+        const rect = cccCanvas.getBoundingClientRect();
+        const scaleX = cccCanvas.width / rect.width;
+        const scaleY = cccCanvas.height / rect.height;
+        const x = Math.floor((e.clientX - rect.left) * scaleX);
+        const y = Math.floor((e.clientY - rect.top) * scaleY);
+
+        const pixel = ctx.getImageData(x, y, 1, 1).data;
+        const hex = '#' + [pixel[0], pixel[1], pixel[2]].map(function (c) {
+            return c.toString(16).padStart(2, '0');
+        }).join('').toUpperCase();
+
+        const targetHexId = targetHexMap[cccActiveTarget];
+        $(targetHexId).value = hex;
+        updateAll();
+    });
+
+    cccClearImage.addEventListener('click', function () {
+        cccImageInput.value = '';
+        ctx.clearRect(0, 0, cccCanvas.width, cccCanvas.height);
+        cccCanvas.width = 0;
+        cccCanvas.height = 0;
+        cccCanvasHolder.style.display = 'none';
+        cccImageEmpty.style.display = 'block';
+        cccClearImage.style.display = 'none';
+    });
 
     updateAll();
 })();
